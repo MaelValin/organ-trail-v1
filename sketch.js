@@ -77,10 +77,11 @@ function setup() {
 
   createBorders();
 
-  noLoop();
+  
 }
 
 function createStartButton() {
+    
   let button = document.createElement("button");
   button.innerHTML = "Start";
   button.id = "startButton";
@@ -123,7 +124,8 @@ function spawnZombie() {
     zombie.overlaps(borderLeft, false);
     zombie.overlaps(borderRight, false);
     zombie.layer = 2;
-  
+
+   
     let randomDifficulty = random();
     if (randomDifficulty < 0.8) {
       // Normal zombie
@@ -158,7 +160,53 @@ function spawnZombie() {
     zombies.push(zombie); // Ajoute le zombie au tableau
   }
   
- 
+  // Appeler spawnZombie toutes les 4 secondes
+  setInterval(() => {
+      
+  
+      if (activity === 'daily') {
+    let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
+    if (hasBossZombie) {
+      if (timerseconde % 7 === 0) {
+        spawnZombie();
+      }
+    } else {
+      if (timerseconde % 4 === 0) {
+        spawnZombie();
+        console.log("spawn");
+        console.log(zombies)
+        
+      }
+    }
+  }
+  
+  if (activity === 'night') {
+    let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
+    if (hasBossZombie) {
+      if (timerseconde % 5 === 0) {
+        spawnZombie();
+      }
+    } else {
+      if (timerseconde % 3 === 0) {
+        spawnZombie();
+      }
+    }
+  
+  }
+  if (activity === 'hard') {
+    let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
+    if (hasBossZombie) {
+      if (timerseconde % 3 === 0) {
+        spawnZombie();
+      }
+    } else {
+      if (timerseconde % 2 === 0) {
+        spawnZombie();
+      }
+    }
+  }
+  
+  }, 1000);
   
   
   
@@ -347,16 +395,9 @@ function runstart() {
   trajectoire2.shape = "circle";
   trajectoire2.color = "white";
 
-  createBorders();
+  
 
-  zombies.forEach((zombie) => {
-    [borderTop, borderBottom, borderLeft, borderRight].forEach((border) => {
-      if (zombie.overlap(border)) {
-        console.log("Zombie touche un bord, mais pas de blocage.");
-      }
-    });
-  });
-
+  
 }
 
 function mousePressed() {
