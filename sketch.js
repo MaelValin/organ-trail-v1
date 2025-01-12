@@ -102,7 +102,16 @@ function createStartButton() {
   });
 }
 
-// Ennemi
+
+
+
+
+
+
+function runstart() {
+
+
+    // Ennemi
 function spawnZombie() {
     let randomX, randomY;
   
@@ -209,23 +218,18 @@ function spawnZombie() {
   }, 1000);
   
   
-  
-  
-  
-  
-
-  function spawnItem() {
+function spawnItem() {
     let randomX, randomY;
     let validPosition = false;
 
     // Générer des coordonnées valides
     while (!validPosition) {
-      randomX = random(100, canvasWidth - 100);
-      randomY = random(100, canvasHeight - 100);
+        randomX = random(100, canvasWidth - 100);
+        randomY = random(100, canvasHeight - 100);
 
-      validPosition = decorPositions.every(
-        (pos) => dist(randomX, randomY, pos.x, pos.y) >= 120
-      );
+        validPosition = decorPositions.every(
+            (pos) => dist(randomX, randomY, pos.x, pos.y) >= 120
+        );
     }
 
     let item = new Sprite(randomX, randomY, 50, 50);
@@ -235,35 +239,29 @@ function spawnZombie() {
 
     // Définir le type d'item
     const itemTypes = [
-      { color: "cyan", value: 1 }, // Valeur faible
-      { color: "orange", value: 2 },
-      { color: "blue", value: 3 }, // Valeur moyenne
-      { color: "red", value: 4 }, // Valeur élevée
+        { color: "cyan", value: 1 }, // Valeur faible
+        { color: "orange", value: 2 },
+        { color: "blue", value: 3 }, // Valeur moyenne
+        { color: "red", value: 4 }, // Valeur élevée
     ];
 
     const randomValue = random();
     const typeIndex =
-      randomValue < 0.7 ? floor(random(0, 2)) : floor(random(2, 4));
+        randomValue < 0.7 ? floor(random(0, 2)) : floor(random(2, 4));
     Object.assign(item, itemTypes[typeIndex]);
 
     items.push(item); // Ajouter l'item à la liste
-  }
+}
 
-  // Appeler item toutes les 10 secondes
-  setInterval(() => {
+// Appeler item toutes les 10 secondes
+setInterval(() => {
     if (items.length < 6 && timerseconde % timerandom === 0) {
-      timerandom = Math.floor(random(15, 31));
-      console.log(timerandom);
-      spawnItem();
+        timerandom = Math.floor(random(15, 31));
+        console.log(timerandom);
+        spawnItem();
     }
-  }, 1000);
+}, 1000);
 
-
-
-
-
-
-function runstart() {
   
   timermillieseconde = 0;
   timerseconde = 0;
@@ -497,18 +495,7 @@ function update() {
       ) {
         zombie.vie = zombie.vie - 1;
         ammo.opacity = 0;
-      } else if (
-        ammo.overlaps(zombie) &&
-        (zombie.shapecolor === "blue" || zombie.shapecolor === "purple") &&
-        zombie.vie >= 2
-      ) {
-        zombie.vie = zombie.vie - 1;
-        zombie.speed = 0;
-        setTimeout(() => {
-          zombie.speed =
-            zombie.difficulty === 4 || zombie.difficulty === 3 ? 0 : 2; // Restore speed based on difficulty
-        }, 2000);
-      }
+      } 
 
 
   
@@ -548,12 +535,18 @@ function update() {
       if (distance > minDistance) {
         zombie.direction = atan2(player.y - zombie.y, player.x - zombie.x);
         if (zombie.difficulty === 1 || zombie.difficulty === 4) {
+           
           zombie.speed = 2;
+        
         } else if (zombie.difficulty === 2) {
           zombie.speed = 3;
         } else {
+            
           zombie.speed = 1;
+
         }
+
+        
       } else {
         zombie.speed = 0;
       }
