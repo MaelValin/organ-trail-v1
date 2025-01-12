@@ -3,6 +3,7 @@ let baseSpeed = 5;
 let playerSpeed = baseSpeed;
 
 let zombies = [];
+let zombie;
 
 let canvasWidth = 1200;
 let canvasHeight = 700;
@@ -17,12 +18,15 @@ let scoremoney = 0;
 let scorescrach = 0;
 
 let items = [];
+let item;
 let decorPositions = [];
+let randomDecor = [];
+let decorSprites = [];
 
-let timerandom = 10;
+let timerandom = 5;
 
 let activity = "daily";
-let ammoquantity = 10;
+let ammoquantity = 500;
 
 // Rechargement
 let time;
@@ -76,12 +80,10 @@ function setup() {
   background(0);
 
   createBorders();
-
   
 }
 
 function createStartButton() {
-    
   let button = document.createElement("button");
   button.innerHTML = "Start";
   button.id = "startButton";
@@ -97,24 +99,86 @@ function createStartButton() {
 
   button.addEventListener("click", () => {
     button.remove(); // Remove the button
+    difficulty(); // Display the difficulty buttons
+  });
+}
+
+function difficulty() {
+  let buttondaily = document.createElement("button");
+  buttondaily.innerHTML = "Daily";
+  buttondaily.id = "dailyButton";
+  buttondaily.style.position = "absolute";
+  buttondaily.style.bottom = "30rem";
+  buttondaily.style.left = "50%";
+  buttondaily.style.fontSize = "8rem";
+  buttondaily.style.fontFamily = "'Jersey 15', serif";
+  buttondaily.style.borderRadius = "10px";
+  buttondaily.style.transform = "translateX(-50%)";
+  buttondaily.style.zIndex = "1";
+  document.body.appendChild(buttondaily);
+
+  buttondaily.addEventListener("click", () => {
+    activity = "daily";
+    buttondaily.remove();
+    buttonnight.remove();
+    buttonhard.remove();
+    runstart(); // Start the game
+    loop(); // Start the update loop
+  });
+
+  let buttonnight = document.createElement("button");
+  buttonnight.innerHTML = "Night";
+  buttonnight.id = "nightButton";
+  buttonnight.style.position = "absolute";
+  buttonnight.style.bottom = "20rem";
+  buttonnight.style.left = "50%";
+  buttonnight.style.fontSize = "8rem";
+  buttonnight.style.fontFamily = "'Jersey 15', serif";
+  buttonnight.style.borderRadius = "10px";
+  buttonnight.style.transform = "translateX(-50%)";
+  buttonnight.style.zIndex = "1";
+  document.body.appendChild(buttonnight);
+
+  buttonnight.addEventListener("click", () => {
+    activity = "night";
+    buttondaily.remove();
+    buttonnight.remove();
+    buttonhard.remove();
+    runstart(); // Start the game
+    loop(); // Start the update loop
+  });
+
+  let buttonhard = document.createElement("button");
+  buttonhard.innerHTML = "Hard";
+  buttonhard.id = "hardButton";
+  buttonhard.style.position = "absolute";
+  buttonhard.style.bottom = "10rem";
+  buttonhard.style.left = "50%";
+  buttonhard.style.fontSize = "8rem";
+  buttonhard.style.fontFamily = "'Jersey 15', serif";
+  buttonhard.style.borderRadius = "10px";
+  buttonhard.style.transform = "translateX(-50%)";
+  buttonhard.style.zIndex = "1";
+  document.body.appendChild(buttonhard);
+
+  buttonhard.addEventListener("click", () => {
+    activity = "hard";
+    buttondaily.remove();
+    buttonnight.remove();
+    buttonhard.remove();
     runstart(); // Start the game
     loop(); // Start the update loop
   });
 }
 
-
-
-
-
-
+let runstar=false;
 
 function runstart() {
-
-
-    // Ennemi
-function spawnZombie() {
+    runstar=true;
+  // Ennemi
+  function spawnZombie() {
     let randomX, randomY;
-  
+
     // Générer des coordonnées aléatoires en dehors du canvas
     if (random() < 0.5) {
       randomX = random() < 0.5 ? -50 : canvasWidth + 50;
@@ -123,7 +187,7 @@ function spawnZombie() {
       randomX = random(-50, canvasWidth + 50);
       randomY = random() < 0.5 ? -50 : canvasHeight + 50;
     }
-  
+
     let zombie = new Sprite(randomX, randomY, 50, 50);
     zombie.shape = "circle";
     zombie.collider = "dynamic";
@@ -134,7 +198,6 @@ function spawnZombie() {
     zombie.overlaps(borderRight, false);
     zombie.layer = 2;
 
-   
     let randomDifficulty = random();
     if (randomDifficulty < 0.8) {
       // Normal zombie
@@ -175,71 +238,63 @@ function spawnZombie() {
         zombie.vie = 1;
       }
     }
-  
+
     zombies.push(zombie); // Ajoute le zombie au tableau
   }
-  
+
   // Appeler spawnZombie toutes les 4 secondes
   setInterval(() => {
-      
-  
-      if (activity === 'daily') {
-    let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
-    if (hasBossZombie) {
-      if (timerseconde % 7 === 0) {
-        spawnZombie();
-      }
-    } else {
-      if (timerseconde % 4 === 0) {
-        spawnZombie();
-        console.log("spawn");
-        console.log(zombies)
-        
+    if (activity === "daily") {
+      let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
+      if (hasBossZombie) {
+        if (timerseconde % 7 === 0) {
+          spawnZombie();
+        }
+      } else {
+        if (timerseconde % 4 === 0) {
+          spawnZombie();
+        }
       }
     }
-  }
-  
-  if (activity === 'night') {
-    let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
-    if (hasBossZombie) {
-      if (timerseconde % 5 === 0) {
-        spawnZombie();
-      }
-    } else {
-      if (timerseconde % 3 === 0) {
-        spawnZombie();
-      }
-    }
-  
-  }
-  if (activity === 'hard') {
-    let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
-    if (hasBossZombie) {
-      if (timerseconde % 3 === 0) {
-        spawnZombie();
-      }
-    } else {
-      if (timerseconde % 2 === 0) {
-        spawnZombie();
+
+    if (activity === "night") {
+      let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
+      if (hasBossZombie) {
+        if (timerseconde % 5 === 0) {
+          spawnZombie();
+        }
+      } else {
+        if (timerseconde % 3 === 0) {
+          spawnZombie();
+        }
       }
     }
-  }
-  
+    if (activity === "hard") {
+      let hasBossZombie = zombies.some((zombie) => zombie.difficulty === 4);
+      if (hasBossZombie) {
+        if (timerseconde % 3 === 0) {
+          spawnZombie();
+        }
+      } else {
+        if (timerseconde % 2 === 0) {
+          spawnZombie();
+        }
+      }
+    }
   }, 1000);
-  
-  
-function spawnItem() {
+
+  function spawnItem() {
     let randomX, randomY;
     let validPosition = false;
 
     // Générer des coordonnées valides
     while (!validPosition) {
-        randomX = random(100, canvasWidth - 100);
-        randomY = random(100, canvasHeight - 100);
+      randomX = random(100, canvasWidth - 100);
+      randomY = random(100, canvasHeight - 100);
 
-        validPosition = decorPositions.every(
-            (pos) => dist(randomX, randomY, pos.x, pos.y) >= 120
-        );
+      validPosition = decorPositions.every(
+        (pos) => dist(randomX, randomY, pos.x, pos.y) >= 120
+      );
     }
 
     let item = new Sprite(randomX, randomY, 50, 50);
@@ -249,30 +304,32 @@ function spawnItem() {
 
     // Définir le type d'item
     const itemTypes = [
-        { color: "cyan", value: 1 }, // Valeur faible
-        { color: "orange", value: 2 },
-        { color: "blue", value: 3 }, // Valeur moyenne
-        { color: "red", value: 4 }, // Valeur élevée
+      { color: "cyan", value: 1 }, // Valeur faible
+      { color: "orange", value: 2 },
+      { color: "blue", value: 3 }, // Valeur moyenne
+      { color: "red", value: 4 }, // Valeur élevée
     ];
 
     const randomValue = random();
     const typeIndex =
-        randomValue < 0.7 ? floor(random(0, 2)) : floor(random(2, 4));
+      randomValue < 0.7 ? floor(random(0, 2)) : floor(random(2, 4));
     Object.assign(item, itemTypes[typeIndex]);
 
     items.push(item); // Ajouter l'item à la liste
-}
+  }
 
-// Appeler item toutes les 10 secondes
-setInterval(() => {
-    if (items.length < 6 && timerseconde % timerandom === 0) {
-        timerandom = Math.floor(random(15, 31));
-        console.log(timerandom);
-        spawnItem();
+ 
+   
+  // Appeler item toutes les 10 secondes
+  setInterval(() => {
+    if (items.length < 6 && runstar===true) {
+      timerandom = Math.floor(random(10, 31));
+      console.log(timerandom);
+      spawnItem();
     }
-}, 1000);
-
+  }, timerandom * 1000);
   
+
   timermillieseconde = 0;
   timerseconde = 0;
   timerminute = 0;
@@ -316,8 +373,9 @@ setInterval(() => {
     textammo.textColor = "white";
   }
 
-  const activities = ["daily", "night", "hard"];
-  activity = activities[Math.floor(Math.random() * activities.length)];
+  //random activity choisir la difficulté
+  /*const activities = ["daily", "night", "hard"];
+  activity = activities[Math.floor(Math.random() * activities.length)];*/
 
   textactivity = new Sprite(canvasWidth / 2, canvasHeight - 50, 0, 0);
   textactivity.textSize = 40;
@@ -333,12 +391,9 @@ setInterval(() => {
   player.friction = 0;
   player.layer = 10;
 
-
-   
-
-
   // Spawn 6 random decor
 
+  // Dans la fonction pour créer les décors
   for (let i = 0; i < 6; i++) {
     let validPosition = false;
     let randomX, randomY;
@@ -349,7 +404,7 @@ setInterval(() => {
 
       validPosition = true;
 
-      // Check distance from borders
+      // Vérifier la distance par rapport aux bordures
       if (
         randomX < 150 ||
         randomX > canvasWidth - 150 ||
@@ -359,7 +414,7 @@ setInterval(() => {
         validPosition = false;
       }
 
-      // Check distance from other decor
+      // Vérifier la distance par rapport aux autres décors
       for (let pos of decorPositions) {
         let distance = dist(randomX, randomY, pos.x, pos.y);
         if (distance < 250) {
@@ -371,10 +426,14 @@ setInterval(() => {
 
     decorPositions.push({ x: randomX, y: randomY });
 
+    // Créer le sprite du décor
     let randomDecor = new Sprite(randomX, randomY, 150, 100);
     randomDecor.color = "blue";
     randomDecor.collider = "static";
     randomDecor.layer = 1;
+
+    // Ajouter le sprite à une collection si nécessaire
+    decorSprites.push(randomDecor); // Supposons que tu as un tableau decorSprites pour stocker les sprites
   }
 
   // Projectile
@@ -402,10 +461,6 @@ setInterval(() => {
   trajectoire2.collider = "none";
   trajectoire2.shape = "circle";
   trajectoire2.color = "white";
-
-  
-
-  
 }
 
 function mousePressed() {
@@ -442,21 +497,89 @@ function mouseReleased() {
 }
 
 function update() {
+    if (runstar===true) {
+       
   background(0);
 
-  allSprites.draw();
+  for (let zombie of zombies) {
+    if (player.overlaps(zombie) && zombie.vie > 0) {
+        runstar=false;
+        noLoop();
+        textammo.remove();
+        textactivity.remove();
+        textmoney.remove();
+        textscrach.remove();
+        reload.remove();
+        time.remove();
+        player.remove();
+        if (ammo.opacity === 1) {
+          ammo.remove();
+        }
+        zombies.forEach((zombie) => zombie.remove());
+        for (let i = 0; i < items.length; i++) {
+          items[i].remove();
+        }
+        items = [];
+    
+        zombies = [];
+    
+        decorSprites.forEach((decor) => decor.remove()); // On appelle remove sur chaque décor
+        decorSprites = [];
+    
+        
+       
+    
+        endbadGame();
+        return;
+    }
+  }
+
+  if (timerminute === 1 && timerseconde === 30) {
+    runstar=false;
+    noLoop();
+    textammo.remove();
+    textactivity.remove();
+    textmoney.remove();
+    textscrach.remove();
+    reload.remove();
+    time.remove();
+    player.remove();
+    if (ammo.opacity === 1) {
+      ammo.remove();
+    }
+    zombies.forEach((zombie) => zombie.remove());
+    for (let i = 0; i < items.length; i++) {
+      items[i].remove();
+    }
+    items = [];
+
+    zombies = [];
+
+    decorSprites.forEach((decor) => decor.remove()); // On appelle remove sur chaque décor
+    decorSprites = [];
+
+    timereload = 0;
+    timerseconde = 0;
+    timerminute = 0;
+   
+
+    endgoodGame();
+    return;
+  }
 
   // Gestion du timer
-  timermillieseconde += deltaTime / 1000;
-  if (timermillieseconde >= 1) {
+  if (timermillieseconde === 60) {
     timermillieseconde = 0;
     timerseconde++;
     if (timerseconde >= 60) {
       timerseconde = 0;
       timerminute++;
     }
+  } else {
+    timermillieseconde++;
   }
   time.text = `Time : ${timerminute}min ${timerseconde}s`;
+  console.log(time.text);
 
   // Gestion du rechargement
   if (timereload > 0) {
@@ -501,18 +624,14 @@ function update() {
         (zombie.shapecolor === "red" ||
           zombie.shapecolor === "yellow" ||
           zombie.shapecolor === "blue" ||
-        zombie.shapecolor === "purple")
+          zombie.shapecolor === "purple")
       ) {
         zombie.vie = zombie.vie - 1;
         ammo.opacity = 0;
-        if(zombie.shapecolor === "blue" || zombie.shapecolor === "purple"){
+        if (zombie.shapecolor === "blue" || zombie.shapecolor === "purple") {
           zombie.stunnedTime = 5;
         }
-      } 
-      
-
-
-  
+      }
 
       if (zombie.vie === 0) {
         zombie.color = "green";
@@ -535,9 +654,8 @@ function update() {
     ammo.y = player.y;
   }
 
-
   // Mise à jour des zombies
-for (let zombie of zombies) {
+  for (let zombie of zombies) {
     if (
       zombie.shapecolor === "red" ||
       zombie.shapecolor === "yellow" ||
@@ -546,15 +664,15 @@ for (let zombie of zombies) {
     ) {
       let distance = dist(zombie.x, zombie.y, player.x, player.y);
       let minDistance = player.width / 2 + zombie.width / 2;
-  
+
       // Si le zombie est étourdi, il ne bouge pas
       if (zombie.stunnedTime > 0) {
-        zombie.stunnedTime -= deltaTime / 300;  // Diminuer le temps de l'étourdissement
+        zombie.stunnedTime -= deltaTime / 300; // Diminuer le temps de l'étourdissement
         zombie.speed = 0;
       } else {
         if (distance > minDistance) {
           zombie.direction = atan2(player.y - zombie.y, player.x - zombie.x);
-          
+
           // Définir la vitesse en fonction de la difficulté du zombie
           if (zombie.difficulty === 1 || zombie.difficulty === 4) {
             zombie.speed = 2;
@@ -564,13 +682,12 @@ for (let zombie of zombies) {
             zombie.speed = 1;
           }
         } else {
-          zombie.speed = 0;  // Arrêt lorsqu'il est trop proche du joueur
+          zombie.speed = 0; // Arrêt lorsqu'il est trop proche du joueur
         }
       }
     }
   }
 
-  
   for (let item of items) {
     if (player.overlaps(item)) {
       if (item.value === 1) {
@@ -621,35 +738,35 @@ for (let zombie of zombies) {
     if (kb.pressing("w")) {
       player.direction = 270;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("s")) {
       player.direction = 90;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("a")) {
       player.direction = 180;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("d")) {
       player.direction = 0;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("w") && kb.pressing("a")) {
       player.direction = 225;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("w") && kb.pressing("d")) {
       player.direction = 315;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("s") && kb.pressing("a")) {
       player.direction = 135;
       player.speed = playerSpeed;
-    } 
+    }
     if (kb.pressing("s") && kb.pressing("d")) {
       player.direction = 45;
       player.speed = playerSpeed;
-    } 
+    }
     if (
       !kb.pressing("w") &&
       !kb.pressing("s") &&
@@ -661,7 +778,152 @@ for (let zombie of zombies) {
       player.vel.y = 0;
     }
   }
+}
+}
+
+function endbadGame() {
+    background(0);
+
+
   
+    let textgameover = document.createElement("div");
+    textgameover.innerHTML = "You survivied";
+    textgameover.style.position = "absolute";
+    textgameover.style.top = "15%";
+    textgameover.style.left = "50%";
+    textgameover.style.fontSize = "12rem";
+    textgameover.style.fontFamily = "'Jersey 15', serif";
+    textgameover.style.transform = "translate(-50%, -50%)";
+    textgameover.style.zIndex = "1";
+    textgameover.style.color = "white";
+    textgameover.style.width = "max-content";
+    document.body.appendChild(textgameover);
+  
+    let textscoreEnd = document.createElement("div");
+    textscoreEnd.innerHTML = "Score : " + scoremoney;
+    textscoreEnd.style.position = "absolute";
+    textscoreEnd.style.top = "40%";
+    textscoreEnd.style.left = "50%";
+    textscoreEnd.style.fontSize = "8rem";
+    textscoreEnd.style.fontFamily = "'Jersey 15', serif";
+    textscoreEnd.style.transform = "translate(-50%, -50%)";
+    textscoreEnd.style.zIndex = "1";
+    textscoreEnd.style.color = "white";
+    document.body.appendChild(textscoreEnd);
+  
+    let textscrachEnd = document.createElement("div");
+    textscrachEnd.innerHTML = "Scratch : " + scorescrach;
+    textscrachEnd.style.position = "absolute";
+    textscrachEnd.style.top = "55%";
+    textscrachEnd.style.left = "50%";
+    textscrachEnd.style.fontSize = "8rem";
+    textscrachEnd.style.fontFamily = "'Jersey 15', serif";
+    textscrachEnd.style.transform = "translate(-50%, -50%)";
+    textscrachEnd.style.zIndex = "1";
+    textscrachEnd.style.color = "white";
+    document.body.appendChild(textscrachEnd);
+  
+    let buttonbadmenu = document.createElement("button");
+    buttonbadmenu.innerHTML = "Menu";
+    buttonbadmenu.id = "restartbuttonbad";
+    buttonbadmenu.style.position = "absolute";
+    buttonbadmenu.style.top = "70%";
+    buttonbadmenu.style.left = "50%";
+    buttonbadmenu.style.fontSize = "8rem";
+    buttonbadmenu.style.fontFamily = "'Jersey 15', serif";
+    buttonbadmenu.style.borderRadius = "10px";
+    buttonbadmenu.style.transform = "translateX(-50%)";
+    buttonbadmenu.style.zIndex = "1";
+    document.body.appendChild(buttonbadmenu);
+  
+    buttonbadmenu.addEventListener("click", () => {
+      textgameover.remove();
+      textscoreEnd.remove();
+      textscrachEnd.remove();
+      
+  
+      timereload = 0;
+      timerseconde = 0;
+      timerminute = 0;
+      scoremoney = 0;
+      scorescrach = 0;
+      ammoquantity = 10;
+  
+      buttonbadmenu.remove(); // Remove the button
+      location.reload();
+      
+    });
+  }
+
+function endgoodGame() {
+  background(0);
+
+  let textgameover = document.createElement("div");
+  textgameover.innerHTML = "You survivied";
+  textgameover.style.position = "absolute";
+  textgameover.style.top = "15%";
+  textgameover.style.left = "50%";
+  textgameover.style.fontSize = "12rem";
+  textgameover.style.fontFamily = "'Jersey 15', serif";
+  textgameover.style.transform = "translate(-50%, -50%)";
+  textgameover.style.zIndex = "1";
+  textgameover.style.color = "white";
+  textgameover.style.width = "max-content";
+  document.body.appendChild(textgameover);
+
+  let textscoreEnd = document.createElement("div");
+  textscoreEnd.innerHTML = "Score : " + scoremoney;
+  textscoreEnd.style.position = "absolute";
+  textscoreEnd.style.top = "40%";
+  textscoreEnd.style.left = "50%";
+  textscoreEnd.style.fontSize = "8rem";
+  textscoreEnd.style.fontFamily = "'Jersey 15', serif";
+  textscoreEnd.style.transform = "translate(-50%, -50%)";
+  textscoreEnd.style.zIndex = "1";
+  textscoreEnd.style.color = "white";
+  document.body.appendChild(textscoreEnd);
+
+  let textscrachEnd = document.createElement("div");
+  textscrachEnd.innerHTML = "Scratch : " + scorescrach;
+  textscrachEnd.style.position = "absolute";
+  textscrachEnd.style.top = "55%";
+  textscrachEnd.style.left = "50%";
+  textscrachEnd.style.fontSize = "8rem";
+  textscrachEnd.style.fontFamily = "'Jersey 15', serif";
+  textscrachEnd.style.transform = "translate(-50%, -50%)";
+  textscrachEnd.style.zIndex = "1";
+  textscrachEnd.style.color = "white";
+  document.body.appendChild(textscrachEnd);
+
+  let button = document.createElement("button");
+  button.innerHTML = "Menu";
+  button.id = "restartButton";
+  button.style.position = "absolute";
+  button.style.top = "70%";
+  button.style.left = "50%";
+  button.style.fontSize = "8rem";
+  button.style.fontFamily = "'Jersey 15', serif";
+  button.style.borderRadius = "10px";
+  button.style.transform = "translateX(-50%)";
+  button.style.zIndex = "1";
+  document.body.appendChild(button);
+
+  button.addEventListener("click", () => {
+    textgameover.remove();
+    textscoreEnd.remove();
+    textscrachEnd.remove();
+    
+    timereload = 0;
+    timerseconde = 0;
+    timerminute = 0;
+    scoremoney = 0;
+    scorescrach = 0;
+    ammoquantity = 10;
+
+    button.remove(); // Remove the button
+    location.reload();
+    
+  });
 }
 
 createStartButton();
