@@ -150,7 +150,7 @@ function spawnZombie() {
       zombie.speed = 4;
       zombie.difficulty = 2;
       zombie.vie = 1;
-    } else if (randomDifficulty < 0.98) {
+    } else if (randomDifficulty < 0.99) {
       // Heavy zombie
       zombie.color = "blue";
       zombie.shapecolor = "blue";
@@ -159,11 +159,21 @@ function spawnZombie() {
       zombie.vie = 2;
     } else {
       // Boss zombie
-      zombie.color = "purple";
-      zombie.shapecolor = "purple";
-      zombie.speed = 2;
-      zombie.difficulty = 4;
-      zombie.vie = 5;
+      let hasBossZombie = zombies.some((z) => z.difficulty === 4);
+      if (!hasBossZombie && activity !== "daily") {
+        zombie.color = "purple";
+        zombie.shapecolor = "purple";
+        zombie.speed = 2;
+        zombie.difficulty = 4;
+        zombie.vie = 5;
+      } else {
+        // If a boss zombie is already present, spawn a normal zombie instead
+        zombie.color = "red";
+        zombie.shapecolor = "red";
+        zombie.speed = 2;
+        zombie.difficulty = 1;
+        zombie.vie = 1;
+      }
     }
   
     zombies.push(zombie); // Ajoute le zombie au tableau
@@ -491,11 +501,15 @@ function update() {
         (zombie.shapecolor === "red" ||
           zombie.shapecolor === "yellow" ||
           zombie.shapecolor === "blue" ||
-          (zombie.shapecolor === "purple" && zombie.vie === 1))
+        zombie.shapecolor === "purple")
       ) {
         zombie.vie = zombie.vie - 1;
         ammo.opacity = 0;
+        if(zombie.shapecolor === "blue" || zombie.shapecolor === "purple"){
+          zombie.stunnedTime = 5;
+        }
       } 
+      
 
 
   
@@ -521,8 +535,9 @@ function update() {
     ammo.y = player.y;
   }
 
+
   // Mise à jour des zombies
-  for (let zombie of zombies) {
+for (let zombie of zombies) {
     if (
       zombie.shapecolor === "red" ||
       zombie.shapecolor === "yellow" ||
@@ -531,28 +546,31 @@ function update() {
     ) {
       let distance = dist(zombie.x, zombie.y, player.x, player.y);
       let minDistance = player.width / 2 + zombie.width / 2;
-
-      if (distance > minDistance) {
-        zombie.direction = atan2(player.y - zombie.y, player.x - zombie.x);
-        if (zombie.difficulty === 1 || zombie.difficulty === 4) {
-           
-          zombie.speed = 2;
-        
-        } else if (zombie.difficulty === 2) {
-          zombie.speed = 3;
-        } else {
-            
-          zombie.speed = 1;
-
-        }
-
-        
-      } else {
+  
+      // Si le zombie est étourdi, il ne bouge pas
+      if (zombie.stunnedTime > 0) {
+        zombie.stunnedTime -= deltaTime / 300;  // Diminuer le temps de l'étourdissement
         zombie.speed = 0;
+      } else {
+        if (distance > minDistance) {
+          zombie.direction = atan2(player.y - zombie.y, player.x - zombie.x);
+          
+          // Définir la vitesse en fonction de la difficulté du zombie
+          if (zombie.difficulty === 1 || zombie.difficulty === 4) {
+            zombie.speed = 2;
+          } else if (zombie.difficulty === 2) {
+            zombie.speed = 3;
+          } else {
+            zombie.speed = 1;
+          }
+        } else {
+          zombie.speed = 0;  // Arrêt lorsqu'il est trop proche du joueur
+        }
       }
     }
   }
 
+  
   for (let item of items) {
     if (player.overlaps(item)) {
       if (item.value === 1) {
