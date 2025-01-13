@@ -45,9 +45,29 @@ let colorfont = "#464646";
 
 let isMousePressed = false; // État du clic
 
-/*function preload() {
-    player = loadImage('player.png');
-}*/
+function preload() {
+    walkdownAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [7,8,9] });
+    walkupAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [17,18] });
+    walkrightAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [2,3,4] });
+    walkleftAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [12,13,14] });
+
+    walkdownrightAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [5,6] });
+    walkdownleftAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [10,11] });
+    walkuprightAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [0,1] });
+    walkupleftAnimation = loadAnimation('asset/arkaduis64x71.png', { width: 64, height: 71, frames: [15,16] });
+
+    // Charger les images
+    downImage = loadImage('asset/ark/sprite_08.png');
+    upImage = loadImage('asset/ark/sprite_17.png');
+    rightImage = loadImage('asset/ark/sprite_03.png');
+    leftImage = loadImage('asset/ark/sprite_12.png');
+    downrightImage = loadImage('asset/ark/sprite_06.png');
+    downleftImage = loadImage('asset/ark/sprite_10.png');
+    uprightImage = loadImage('asset/ark/sprite_01.png');
+    upleftImage = loadImage('asset/ark/sprite_15.png');
+
+
+}
 
 function createBorders() {
   // Créer les bords comme des sprites
@@ -384,12 +404,25 @@ function runstart() {
   textactivity.textColor = "white";
 
   // Joueur
-  player = new Sprite(centerX, centerY, 50, 50);
+  player = new Sprite(centerX, centerY, 15, 40);
   player.vel.x = 0;
   player.vel.y = 0;
   player.rotationLock = true;
   player.friction = 0;
   player.layer = 10;
+  player.scale=2.5;
+
+    player.addAnimation("walkdown", walkdownAnimation, {width: 64, height: 71});
+    player.addAnimation("walkup", walkupAnimation, {width: 64, height: 71});
+    player.addAnimation("walkright", walkrightAnimation, {width: 64, height: 71});
+    player.addAnimation("walkleft", walkleftAnimation, {width: 64, height: 71});
+    player.addAnimation("walkdownright", walkdownrightAnimation, {width: 64, height: 71});
+    player.addAnimation("walkdownleft", walkdownleftAnimation, {width: 64, height: 71});
+    player.addAnimation("walkupright", walkuprightAnimation, {width: 64, height: 71});
+    player.addAnimation("walkupleft", walkupleftAnimation, {width: 64, height: 71});
+
+    
+
 
   // Spawn 6 random decor
 
@@ -604,6 +637,27 @@ function update() {
     trajectoire2.x = player.x + cos(angle) * (130 * factor);
     trajectoire2.y = player.y + sin(angle) * (130 * factor);
     trajectoire2.opacity = 1;
+
+    
+    if (angle >= -PI / 8 && angle < PI / 8) {
+        player.image = rightImage;
+    } else if (angle >= PI / 8 && angle < 3 * PI / 8) {
+        player.image = downrightImage;
+    } else if (angle >= 3 * PI / 8 && angle < 5 * PI / 8) {
+        player.image = downImage;
+    } else if (angle >= 5 * PI / 8 && angle < 7 * PI / 8) {
+        player.image = downleftImage;
+    } else if (angle >= 7 * PI / 8 || angle < -7 * PI / 8) {
+        player.image = leftImage;
+    } else if (angle >= -7 * PI / 8 && angle < -5 * PI / 8) {
+        player.image = upleftImage;
+    } else if (angle >= -5 * PI / 8 && angle < -3 * PI / 8) {
+        player.image = upImage;
+    } else if (angle >= -3 * PI / 8 && angle < -PI / 8) {
+        player.image = uprightImage;
+    }
+      
+
   } else {
     trajectoire.opacity = 0;
     trajectoire1.opacity = 0;
@@ -738,34 +792,42 @@ function update() {
     if (kb.pressing("w")) {
       player.direction = 270;
       player.speed = playerSpeed;
+      player.animation="walkup";
     }
     if (kb.pressing("s")) {
       player.direction = 90;
       player.speed = playerSpeed;
+        player.animation="walkdown";
     }
     if (kb.pressing("a")) {
       player.direction = 180;
       player.speed = playerSpeed;
+        player.animation="walkleft";
     }
     if (kb.pressing("d")) {
       player.direction = 0;
       player.speed = playerSpeed;
+        player.animation="walkright";
     }
     if (kb.pressing("w") && kb.pressing("a")) {
       player.direction = 225;
       player.speed = playerSpeed;
+        player.animation="walkupleft";
     }
     if (kb.pressing("w") && kb.pressing("d")) {
       player.direction = 315;
       player.speed = playerSpeed;
+        player.animation="walkupright";
     }
     if (kb.pressing("s") && kb.pressing("a")) {
       player.direction = 135;
       player.speed = playerSpeed;
+        player.animation="walkdownleft";
     }
     if (kb.pressing("s") && kb.pressing("d")) {
       player.direction = 45;
       player.speed = playerSpeed;
+        player.animation="walkdownright";
     }
     if (
       !kb.pressing("w") &&
@@ -776,6 +838,28 @@ function update() {
       player.speed = 0;
       player.vel.x = 0;
       player.vel.y = 0;
+      player.animation = false;
+
+    if (player.direction === 270) {
+      player.image = downImage;
+    } else if (player.direction === 90) {
+      player.image = upImage;
+    } else if (player.direction === 180) {
+      player.image = leftImage;
+    } else if (player.direction === 0) {
+      player.image = rightImage;
+    } else if (player.direction === 225) {
+      player.image = upleftImage;
+    } else if (player.direction === 315) {
+      player.image = uprightImage;
+    } else if (player.direction === 135) {
+      player.image = downleftImage;
+    } else if (player.direction === 45) {
+      player.image = downrightImage;
+    }
+    
+
+
     }
   }
 }
