@@ -5,8 +5,8 @@ let playerSpeed = baseSpeed;
 let zombies = [];
 let zombie;
 
-let canvasWidth = 1200;
-let canvasHeight = 700;
+let canvasWidth = 1500;
+let canvasHeight = 900;
 let centerX = canvasWidth / 2;
 let centerY = canvasHeight / 2;
 
@@ -404,7 +404,7 @@ function runstart() {
   textactivity.textColor = "white";
 
   // Joueur
-  player = new Sprite(centerX, centerY, 15, 40);
+  player = new Sprite(centerX, centerY, 15, 20);
   player.vel.x = 0;
   player.vel.y = 0;
   player.rotationLock = true;
@@ -545,6 +545,9 @@ function update() {
         reload.remove();
         time.remove();
         player.remove();
+        trajectoire.remove();
+    trajectoire1.remove();
+    trajectoire2.remove();
         if (ammo.opacity === 1) {
           ammo.remove();
         }
@@ -577,6 +580,9 @@ function update() {
     reload.remove();
     time.remove();
     player.remove();
+    trajectoire.remove();
+    trajectoire1.remove();
+    trajectoire2.remove();
     if (ammo.opacity === 1) {
       ammo.remove();
     }
@@ -626,7 +632,7 @@ function update() {
     let distanceToPlayer = dist(mouseX, mouseY, player.x, player.y);
     let maxDistance = 600;
     let factor = max(0, 1 - distanceToPlayer / maxDistance);
-
+  
     let angle = atan2(mouseY - player.y, mouseX - player.x);
     trajectoire.x = player.x + cos(angle) * (50 * factor);
     trajectoire.y = player.y + sin(angle) * (50 * factor);
@@ -637,32 +643,42 @@ function update() {
     trajectoire2.x = player.x + cos(angle) * (130 * factor);
     trajectoire2.y = player.y + sin(angle) * (130 * factor);
     trajectoire2.opacity = 1;
-
-    
-    if (angle >= -PI / 8 && angle < PI / 8) {
-        player.image = rightImage;
-    } else if (angle >= PI / 8 && angle < 3 * PI / 8) {
-        player.image = downrightImage;
-    } else if (angle >= 3 * PI / 8 && angle < 5 * PI / 8) {
-        player.image = downImage;
-    } else if (angle >= 5 * PI / 8 && angle < 7 * PI / 8) {
-        player.image = downleftImage;
-    } else if (angle >= 7 * PI / 8 || angle < -7 * PI / 8) {
-        player.image = leftImage;
-    } else if (angle >= -7 * PI / 8 && angle < -5 * PI / 8) {
-        player.image = upleftImage;
-    } else if (angle >= -5 * PI / 8 && angle < -3 * PI / 8) {
-        player.image = upImage;
-    } else if (angle >= -3 * PI / 8 && angle < -PI / 8) {
-        player.image = uprightImage;
+  
+    // Gestion des animations
+    console.log("Angle:", angle);
+    if (angle >= -22.5 && angle < 22.5) {
+      console.log("Direction: Droite");
+      player.animation = "walkright"; // Droite
+    } else if (angle >= 22.5 && angle < 67.5) {
+      console.log("Direction: Bas-droite");
+      player.animation = "walkdownright"; // Bas-droite
+    } else if (angle >= 67.5 && angle < 112.5) {
+      console.log("Direction: Bas");
+      player.animation = "walkdown"; // Bas
+    } else if (angle >= 112.5 && angle < 157.5) {
+      console.log("Direction: Bas-gauche");
+      player.animation = "walkdownleft"; // Bas-gauche
+    } else if (angle >= 157.5 || angle < -157.5) {
+      console.log("Direction: Gauche");
+      player.animation = "walkleft"; // Gauche
+    } else if (angle >= -157.5 && angle < -112.5) {
+      console.log("Direction: Haut-gauche");
+      player.animation = "walkupleft"; // Haut-gauche
+    } else if (angle >= -112.5 && angle < -67.5) {
+      console.log("Direction: Haut");
+      player.animation = "walkup"; // Haut
+    } else if (angle >= -67.5 && angle < -22.5) {
+      console.log("Direction: Haut-droite");
+      player.animation = "walkupright"; // Haut-droite
     }
-      
+
 
   } else {
     trajectoire.opacity = 0;
     trajectoire1.opacity = 0;
     trajectoire2.opacity = 0;
   }
+  
 
   if (ammoquantity === 0) {
     textammo.text = "Out of Ammo";
@@ -871,7 +887,7 @@ function endbadGame() {
 
   
     let textgameover = document.createElement("div");
-    textgameover.innerHTML = "You survivied";
+    textgameover.innerHTML = "Game Over";
     textgameover.style.position = "absolute";
     textgameover.style.top = "15%";
     textgameover.style.left = "50%";
@@ -886,7 +902,7 @@ function endbadGame() {
     let textscoreEnd = document.createElement("div");
     textscoreEnd.innerHTML = "Score : " + scoremoney;
     textscoreEnd.style.position = "absolute";
-    textscoreEnd.style.top = "40%";
+    textscoreEnd.style.top = "35%";
     textscoreEnd.style.left = "50%";
     textscoreEnd.style.fontSize = "8rem";
     textscoreEnd.style.fontFamily = "'Jersey 15', serif";
@@ -898,7 +914,7 @@ function endbadGame() {
     let textscrachEnd = document.createElement("div");
     textscrachEnd.innerHTML = "Scratch : " + scorescrach;
     textscrachEnd.style.position = "absolute";
-    textscrachEnd.style.top = "55%";
+    textscrachEnd.style.top = "50%";
     textscrachEnd.style.left = "50%";
     textscrachEnd.style.fontSize = "8rem";
     textscrachEnd.style.fontFamily = "'Jersey 15', serif";
@@ -906,12 +922,24 @@ function endbadGame() {
     textscrachEnd.style.zIndex = "1";
     textscrachEnd.style.color = "white";
     document.body.appendChild(textscrachEnd);
+
+    let textTimeEnd = document.createElement("div");  
+    textTimeEnd.innerHTML = "Time : " + timerminute + "min " + timerseconde + "s";
+    textTimeEnd.style.position = "absolute";
+    textTimeEnd.style.top = "65%";
+    textTimeEnd.style.left = "50%";
+    textTimeEnd.style.fontSize = "8rem";
+    textTimeEnd.style.fontFamily = "'Jersey 15', serif";
+    textTimeEnd.style.transform = "translate(-50%, -50%)";
+    textTimeEnd.style.zIndex = "1";
+    textTimeEnd.style.color = "white";
+    document.body.appendChild(textTimeEnd);
   
     let buttonbadmenu = document.createElement("button");
     buttonbadmenu.innerHTML = "Menu";
     buttonbadmenu.id = "restartbuttonbad";
     buttonbadmenu.style.position = "absolute";
-    buttonbadmenu.style.top = "70%";
+    buttonbadmenu.style.bottom = "5%";
     buttonbadmenu.style.left = "50%";
     buttonbadmenu.style.fontSize = "8rem";
     buttonbadmenu.style.fontFamily = "'Jersey 15', serif";
@@ -924,6 +952,7 @@ function endbadGame() {
       textgameover.remove();
       textscoreEnd.remove();
       textscrachEnd.remove();
+      textTimeEnd.remove();
       
   
       timereload = 0;
@@ -983,7 +1012,7 @@ function endgoodGame() {
   button.innerHTML = "Menu";
   button.id = "restartButton";
   button.style.position = "absolute";
-  button.style.top = "70%";
+  button.style.bottom = "5%";
   button.style.left = "50%";
   button.style.fontSize = "8rem";
   button.style.fontFamily = "'Jersey 15', serif";
