@@ -22,7 +22,41 @@ let decorSprites= globalState.decorSprites;
 
 
 
-export function runstart() {
+
+
+function mousePressed() {
+  if (timereload === 0) {
+    isMousePressed = true;
+  }
+  player.speed = 0;
+  player.direction = 0;
+}
+
+function mouseReleased() {
+  if (isMousePressed && timereload === 0 && ammoquantity > 0) {
+    // Vérifier si la souris est proche du joueur lors du relâchement
+    let distanceToPlayer = dist(mouseX, mouseY, player.x, player.y);
+    if (distanceToPlayer < 200) {
+      // Ajustez cette valeur selon la distance souhaitée
+      // Tirer le projectile
+      ammo.x = player.x;
+      ammo.y = player.y;
+      ammo.direction = createVector(
+        mouseX - player.x,
+        mouseY - player.y
+      ).heading();
+      ammo.speed = 10;
+      ammo.opacity = 1;
+      ammo.collider = "dynamic";
+      ammoquantity = ammoquantity - 1;
+      textammo.text = "Ammo :" + ammoquantity;
+
+      timereload = timerealoadlimite; // Temps de rechargement
+    }
+  }
+  isMousePressed = false;
+}
+function runstart() {
   globalState.runstar=true;
 // Ennemi
 function spawnZombie() {
@@ -323,40 +357,6 @@ trajectoire2.opacity = 0;
 trajectoire2.collider = "none";
 trajectoire2.shape = "circle";
 trajectoire2.color = "white";
-}
-
-
-function mousePressed() {
-  if (timereload === 0) {
-    isMousePressed = true;
-  }
-  player.speed = 0;
-  player.direction = 0;
-}
-
-function mouseReleased() {
-  if (isMousePressed && timereload === 0 && ammoquantity > 0) {
-    // Vérifier si la souris est proche du joueur lors du relâchement
-    let distanceToPlayer = dist(mouseX, mouseY, player.x, player.y);
-    if (distanceToPlayer < 200) {
-      // Ajustez cette valeur selon la distance souhaitée
-      // Tirer le projectile
-      ammo.x = player.x;
-      ammo.y = player.y;
-      ammo.direction = createVector(
-        mouseX - player.x,
-        mouseY - player.y
-      ).heading();
-      ammo.speed = 10;
-      ammo.opacity = 1;
-      ammo.collider = "dynamic";
-      ammoquantity = ammoquantity - 1;
-      textammo.text = "Ammo :" + ammoquantity;
-
-      timereload = timerealoadlimite; // Temps de rechargement
-    }
-  }
-  isMousePressed = false;
 }
 
 function update() {

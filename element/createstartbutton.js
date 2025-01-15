@@ -1,6 +1,5 @@
 import { chooseDifficulty } from './difficulty.js'; // Import direct pour éviter les cycles
-
-export function createStartButton() {
+function createStartButton() {
     let button = document.createElement("button");
     button.innerHTML = "Start";
     button.id = "startButton";
